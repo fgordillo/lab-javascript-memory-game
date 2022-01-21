@@ -28,7 +28,6 @@ const cards = [
 const memoryGame = new MemoryGame(cards);
 
 function setCardsTurned(cards, turned) {
-  console.log("Ponemos las cards a ", turned)
   cards.forEach(cardName => {
     document.querySelectorAll(`[data-card-name="${cardName}"]`).forEach(card => {
       card.classList.toggle("turned", turned);
@@ -48,6 +47,14 @@ function markGameAsFinished() {
   alert("You won!")
 }
 
+function resetGame() {
+  document.querySelectorAll('.card').forEach((card) => {
+    card.classList.toggle("turned", false);
+  })
+  memoryGame.reset();
+  updateScore();
+}
+
 window.addEventListener('load', (event) => {
   let html = '';
   memoryGame.cards.forEach((pic) => {
@@ -62,19 +69,22 @@ window.addEventListener('load', (event) => {
   // Add all the divs to the HTML
   document.querySelector('#memory-board').innerHTML = html;
 
+  document.getElementById("reset").addEventListener("click", resetGame);
+
   // Bind the click event of each element to a function
   document.querySelectorAll('.card').forEach((card) => {
     card.addEventListener('click', () => {
       // TODO: write some code here
-      card.classList.toggle("turned");
       const { cardName } = card.dataset;
       switch (memoryGame.pickedCards.length) {
         case 0:
           memoryGame.pickedCards.push(cardName);
+          card.classList.toggle("turned");
           break;
         
         case 1:
           memoryGame.pickedCards.push(cardName);
+          card.classList.toggle("turned");
           if (memoryGame.checkIfPair(memoryGame.pickedCards[0], memoryGame.pickedCards[1])) {
             setCardsTurned(memoryGame.pickedCards, true);
             memoryGame.pickedCards = [];
@@ -86,13 +96,15 @@ window.addEventListener('load', (event) => {
           }
           
           break;
+
+        default:
+          return;
       }
       
       updateScore();
       if (memoryGame.checkIfFinished()) {
-        markGameAsFinished();
+        setTimeout(() => markGameAsFinished(), 1000);
       }
-      console.log(card.dataset.cardName);
     });
   });
 });
